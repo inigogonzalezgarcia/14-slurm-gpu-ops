@@ -44,6 +44,7 @@ services:
     hostname: gpu-1
     command: ["slurmd"]
     privileged: true   # slurmd needs a writable /sys/fs/cgroup (see etc/slurm/cgroup.conf)
+    init: true         # slurmd finds the cgroup root from PID 1's cgroup, so PID 1 must not be slurmd
     depends_on: [slurmctld]
   gpu-2:
     <<: *node
