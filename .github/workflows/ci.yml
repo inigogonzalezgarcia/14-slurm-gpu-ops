@@ -51,7 +51,7 @@ jobs:
             for f in events job-events gpu-health; do
               echo "<details><summary>$f.jsonl</summary>"; echo; echo '```'; cat "e2e-out/$f.jsonl" 2>/dev/null || true; echo '```'; echo '</details>'
             done
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Logs
         if: failure()
         run: |
