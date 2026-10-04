@@ -43,6 +43,7 @@ services:
     <<: *slurm
     hostname: gpu-1
     command: ["slurmd"]
+    privileged: true   # slurmd needs a writable /sys/fs/cgroup (see etc/slurm/cgroup.conf)
     depends_on: [slurmctld]
   gpu-2:
     <<: *node
