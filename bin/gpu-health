@@ -1,0 +1,9 @@
+#!/bin/sh
+# Slurm HealthCheckProgram. slurmd runs it as root with a minimal environment, so the settings
+# (GPUOPS_HOME, GPU_SIM_DIR, GPUOPS_SHARED, GPU_HEALTH_ARGS) come from /etc/default/gpu-health.
+set -a
+# shellcheck disable=SC1091
+[ -r /etc/default/gpu-health ] && . /etc/default/gpu-health
+set +a
+# shellcheck disable=SC2086 # GPU_HEALTH_ARGS is a list of options
+PYTHONPATH="${GPUOPS_HOME:-/opt/gpuops}" exec python3 -m gpuops health ${GPU_HEALTH_ARGS:-}
