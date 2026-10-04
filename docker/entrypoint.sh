@@ -13,7 +13,7 @@ wait_port() {  # wait_port host port
 }
 
 runuser -u munge -- /usr/sbin/munged
-mkdir -p /shared/runs /shared/gpu-health /var/lib/gpu-sim
+mkdir -p /shared/runs /shared/gpu-health /shared/logs /var/lib/gpu-sim
 
 case "$role" in
   slurmdbd)
