@@ -45,11 +45,11 @@ jobs:
         run: |
           {
             echo '## Lab cluster run'
-            echo '```'; cat e2e-out/sacct.txt 2>/dev/null; echo '```'
-            echo '```'; cat e2e-out/goodput.txt 2>/dev/null; echo '```'
-            echo '```'; cat e2e-out/status.txt 2>/dev/null; echo '```'
+            echo '```'; cat e2e-out/sacct.txt 2>/dev/null || true; echo '```'
+            echo '```'; cat e2e-out/goodput.txt 2>/dev/null || true; echo '```'
+            echo '```'; cat e2e-out/status.txt 2>/dev/null || true; echo '```'
             for f in events job-events gpu-health; do
-              echo "<details><summary>$f.jsonl</summary>"; echo; echo '```'; cat "e2e-out/$f.jsonl" 2>/dev/null; echo '```'; echo '</details>'
+              echo "<details><summary>$f.jsonl</summary>"; echo; echo '```'; cat "e2e-out/$f.jsonl" 2>/dev/null || true; echo '```'; echo '</details>'
             done
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Logs
