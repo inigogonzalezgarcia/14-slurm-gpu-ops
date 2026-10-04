@@ -4,19 +4,19 @@ from pathlib import Path
 
 from gpuops import events
 
-FIX = Path(__file__).parent / "fixtures" / "run"
+FIX = Path(__file__).parent / "fixtures" / "ci-run"  # recorded from CI run 11 (see docs/goodput-from-sacct.md)
 
 
 def load():
     inst = events.parse_sacct((FIX / "sacct.txt").read_text())
-    return inst, events.read_jsonl(FIX / "runs" / "2" / "events.jsonl"), events.health_records(FIX / "gpu-health")
+    return inst, events.read_jsonl(FIX / "job-events.jsonl"), events.read_jsonl(FIX / "gpu-health.jsonl")
 
 
 class Sacct(unittest.TestCase):
     def test_parse(self):
         inst, _, _ = load()
-        self.assertEqual([i.state for i in inst], ["REQUEUED", "COMPLETED"])
-        self.assertEqual((inst[0].nnodes, inst[0].gpus, inst[0].nodes), (2, 8, "gpu-[3-4]"))
+        self.assertEqual([i.state for i in inst], ["REQUEUED", "REQUEUED", "COMPLETED"])
+        self.assertEqual((inst[0].nnodes, inst[0].gpus, inst[0].nodes), (2, 8, "gpu-[1-2]"))
 
     def test_bad_line_and_never_started(self):
         with self.assertRaises(ValueError):
@@ -26,20 +26,17 @@ class Sacct(unittest.TestCase):
 
 
 class Build(unittest.TestCase):
-    """A real local run (docs/goodput-from-sacct.md): XID 48 on gpu-3 at 15:50:45, requeued at 15:50:48."""
+    """Two GPU faults in the CI cluster: XID 79 on gpu-2, then XID 64 on gpu-3."""
 
-    def test_events(self):
+    def test_same_event_log_as_the_ci_run(self):
         ev = events.build(*load())
-        self.assertEqual([e["event"] for e in ev], [
-            "start", "checkpoint_start", "checkpoint_end", "interrupt", "detected", "nodes_ready", "running",
-            "checkpoint_start", "checkpoint_end", "checkpoint_start", "checkpoint_end", "end"])
-        by = {e["event"]: e for e in ev}
-        self.assertEqual(by["start"], {**by["start"], "time": "2026-10-04T15:50:18Z", "nodes": 2, "gpus_per_node": 4})
-        self.assertEqual(by["interrupt"], {**by["interrupt"], "time": "2026-10-04T15:50:45Z", "cause": "gpu_xid48", "node": "gpu-3"})
-        self.assertEqual(by["detected"]["time"], "2026-10-04T15:50:48Z")
-        self.assertEqual(by["nodes_ready"]["time"], "2026-10-04T15:53:19Z")
-        self.assertEqual(by["running"]["time"], "2026-10-04T15:53:24Z")
-        self.assertEqual(ev[-1]["time"], "2026-10-04T15:54:15Z")
+        self.assertEqual(ev, events.read_jsonl(FIX / "events.jsonl"))
+        by = [e for e in ev if e["event"] in ("interrupt", "detected", "nodes_ready", "running")]
+        self.assertEqual([(e["event"], e["time"][11:19], e.get("cause")) for e in by], [
+            ("interrupt", "17:05:51", "gpu_xid79"), ("detected", "17:05:53", None),
+            ("nodes_ready", "17:06:53", None), ("running", "17:06:58", None),
+            ("interrupt", "17:07:27", "gpu_xid64"), ("detected", "17:07:33", None),
+            ("nodes_ready", "17:08:53", None), ("running", "17:08:58", None)])
         times = [e["time"] for e in ev]
         self.assertEqual(times, sorted(times))
 
@@ -47,7 +44,7 @@ class Build(unittest.TestCase):
         inst, job, _ = load()
         ev = events.build(inst, job, [])
         it = next(e for e in ev if e["event"] == "interrupt")
-        self.assertEqual((it["cause"], it["time"]), ("unknown", "2026-10-04T15:50:48Z"))
+        self.assertEqual((it["cause"], it["time"]), ("unknown", "2026-10-04T17:05:53Z"))
 
     def test_unfinished_job(self):
         inst, job, h = load()
