@@ -30,7 +30,19 @@ Sixth in a series: [09 – node remediation](https://github.com/inigogonzalezgar
 
 ## CI run
 
-Every push builds the cluster and runs [tests/e2e.sh](tests/e2e.sh): 8 scenarios, from GPU allocation to a training job that survives two GPU faults.
+Every push builds the cluster and runs [tests/e2e.sh](tests/e2e.sh): 36 checks in 8 scenarios, about 7 minutes. From run 11:
+
+| Scenario | Result |
+|---|---|
+| GPUs | 4 nodes with `gpu:lab:4`; a job asking for 4 GPUs gets `CUDA_VISIBLE_DEVICES=0,1,2,3` |
+| Application XID 13; XID 94 (contained memory error) | No drain; XID 94 logged as `watch` |
+| Fault on a node an admin drained | Admin's reason kept |
+| Training job, XID 79 on one of its nodes | Node drained 2 s after the fault, job requeued, restarted on two other nodes from its checkpoint |
+| Same job, XID 64 + row-remap failure | Node quarantined, job requeued again, finished all 150 steps |
+| `sacct -D` | Three records for the job: `REQUEUED`, `REQUEUED`, `COMPLETED` |
+| Goodput (repo 12 analyzer) | 47.0%; waiting for the restart 42.4%, detection 2.4%, lost work 0.6% ([why](docs/goodput-from-sacct.md#what-a-lab-run-shows)) |
+| Validation | Quarantined node refused; unrepaired node fails burn-in and is drained again; repaired node back in service; reset does not fix a row-remap failure, a replaced board does |
+| Too hot (93 °C) | Cordoned; still drained after it cools down until validated |
 
 ## Run it
 
