@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slurm-gpu-ops"
+version = "0.1.0"
+description = "GPU operations for a Slurm cluster: health check with an XID policy, requeue, validation, goodput from sacct"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = []
+
+[project.scripts]
+gpuops = "gpuops.cli:main"
+
+[tool.setuptools]
+packages = ["gpuops"]

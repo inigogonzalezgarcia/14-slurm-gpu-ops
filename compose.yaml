@@ -1,0 +1,59 @@
+# The lab: MariaDB + slurmdbd + slurmctld + 4 GPU nodes (4 simulated GPUs each).
+#   docker compose up -d --build && tests/e2e.sh
+name: slurm-gpu-lab
+
+x-slurm: &slurm
+  image: slurm-gpu-lab:local
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+  volumes:
+    - gpu-sim:/var/lib/gpu-sim   # the lab's stand-in for DCGM, one file per node
+    - shared:/shared             # shared storage: job output, checkpoints, health-check logs
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    hostname: mariadb
+    environment:
+      MARIADB_DATABASE: slurm_acct_db
+      MARIADB_USER: slurm
+      MARIADB_PASSWORD: lab-only-password
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      retries: 30
+
+  slurmdbd:
+    <<: *slurm
+    hostname: slurmdbd
+    command: ["slurmdbd"]
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  slurmctld:
+    <<: *slurm
+    hostname: slurmctld
+    command: ["slurmctld"]
+    depends_on: [slurmdbd]
+
+  gpu-1: &node
+    <<: *slurm
+    hostname: gpu-1
+    command: ["slurmd"]
+    depends_on: [slurmctld]
+  gpu-2:
+    <<: *node
+    hostname: gpu-2
+  gpu-3:
+    <<: *node
+    hostname: gpu-3
+  gpu-4:
+    <<: *node
+    hostname: gpu-4
+
+volumes:
+  gpu-sim:
+  shared:
