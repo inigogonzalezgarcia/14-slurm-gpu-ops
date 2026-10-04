@@ -1,0 +1,2 @@
+2|lab-train|REQUEUED|2026-10-04T15:50:18|2026-10-04T15:50:48|2|gpu-[3-4]|billing=8,cpu=8,gres/gpu:lab=8,gres/gpu=8,mem=2000M,node=2|0:0
+2|lab-train|COMPLETED|2026-10-04T15:53:19|2026-10-04T15:54:15|2|gpu-[1,4]|billing=8,cpu=8,gres/gpu:lab=8,gres/gpu=8,mem=2000M,node=2|0:0
