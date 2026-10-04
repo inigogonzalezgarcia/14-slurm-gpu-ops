@@ -1,0 +1,17 @@
+{"time": "2026-10-04T17:05:17Z", "event": "startup", "restart": 0, "nodes": ["gpu-1", "gpu-2"], "gpus": "0,1,2,3"}
+{"time": "2026-10-04T17:05:22Z", "event": "running", "step": 0, "restart": 0}
+{"time": "2026-10-04T17:05:47Z", "event": "checkpoint_start", "step": 25}
+{"time": "2026-10-04T17:05:50Z", "event": "checkpoint_end", "step": 25}
+{"time": "2026-10-04T17:06:53Z", "event": "startup", "restart": 1, "nodes": ["gpu-3", "gpu-4"], "gpus": "0,1,2,3"}
+{"time": "2026-10-04T17:06:58Z", "event": "running", "step": 25, "restart": 1}
+{"time": "2026-10-04T17:07:23Z", "event": "checkpoint_start", "step": 50}
+{"time": "2026-10-04T17:07:26Z", "event": "checkpoint_end", "step": 50}
+{"time": "2026-10-04T17:08:53Z", "event": "startup", "restart": 2, "nodes": ["gpu-1", "gpu-4"], "gpus": "0,1,2,3"}
+{"time": "2026-10-04T17:08:58Z", "event": "running", "step": 50, "restart": 2}
+{"time": "2026-10-04T17:09:23Z", "event": "checkpoint_start", "step": 75}
+{"time": "2026-10-04T17:09:26Z", "event": "checkpoint_end", "step": 75}
+{"time": "2026-10-04T17:09:51Z", "event": "checkpoint_start", "step": 100}
+{"time": "2026-10-04T17:09:54Z", "event": "checkpoint_end", "step": 100}
+{"time": "2026-10-04T17:10:19Z", "event": "checkpoint_start", "step": 125}
+{"time": "2026-10-04T17:10:22Z", "event": "checkpoint_end", "step": 125}
+{"time": "2026-10-04T17:10:47Z", "event": "done", "step": 150, "restart": 2}

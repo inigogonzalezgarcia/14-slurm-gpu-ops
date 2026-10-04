@@ -1,0 +1,20 @@
+{"time": "2026-10-04T17:05:17Z", "job": "lab-train-3", "event": "start", "nodes": 2, "gpus_per_node": 4}
+{"time": "2026-10-04T17:05:47Z", "job": "lab-train-3", "event": "checkpoint_start"}
+{"time": "2026-10-04T17:05:50Z", "job": "lab-train-3", "event": "checkpoint_end"}
+{"time": "2026-10-04T17:05:51Z", "job": "lab-train-3", "event": "interrupt", "cause": "gpu_xid79", "node": "gpu-2"}
+{"time": "2026-10-04T17:05:53Z", "job": "lab-train-3", "event": "detected"}
+{"time": "2026-10-04T17:06:53Z", "job": "lab-train-3", "event": "nodes_ready"}
+{"time": "2026-10-04T17:06:58Z", "job": "lab-train-3", "event": "running"}
+{"time": "2026-10-04T17:07:23Z", "job": "lab-train-3", "event": "checkpoint_start"}
+{"time": "2026-10-04T17:07:26Z", "job": "lab-train-3", "event": "checkpoint_end"}
+{"time": "2026-10-04T17:07:27Z", "job": "lab-train-3", "event": "interrupt", "cause": "gpu_xid64", "node": "gpu-3"}
+{"time": "2026-10-04T17:07:33Z", "job": "lab-train-3", "event": "detected"}
+{"time": "2026-10-04T17:08:53Z", "job": "lab-train-3", "event": "nodes_ready"}
+{"time": "2026-10-04T17:08:58Z", "job": "lab-train-3", "event": "running"}
+{"time": "2026-10-04T17:09:23Z", "job": "lab-train-3", "event": "checkpoint_start"}
+{"time": "2026-10-04T17:09:26Z", "job": "lab-train-3", "event": "checkpoint_end"}
+{"time": "2026-10-04T17:09:51Z", "job": "lab-train-3", "event": "checkpoint_start"}
+{"time": "2026-10-04T17:09:54Z", "job": "lab-train-3", "event": "checkpoint_end"}
+{"time": "2026-10-04T17:10:19Z", "job": "lab-train-3", "event": "checkpoint_start"}
+{"time": "2026-10-04T17:10:22Z", "job": "lab-train-3", "event": "checkpoint_end"}
+{"time": "2026-10-04T17:10:47Z", "job": "lab-train-3", "event": "end"}
