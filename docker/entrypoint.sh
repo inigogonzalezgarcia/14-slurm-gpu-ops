@@ -29,6 +29,8 @@ case "$role" in
     exec /usr/sbin/slurmctld -D -v
     ;;
   slurmd)
+    # cgroup v2 without systemd: slurmd creates system.slice/<node>_slurmstepd.scope itself.
+    [ -f /sys/fs/cgroup/cgroup.controllers ] && mkdir -p /sys/fs/cgroup/system.slice
     # Four "GPUs": character devices with no driver behind them (Slurm only checks the file type).
     for i in 0 1 2 3; do
       [ -e "/dev/labgpu$i" ] || mknod -m 666 "/dev/labgpu$i" c 1 3
