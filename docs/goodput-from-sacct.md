@@ -21,25 +21,37 @@ python -m goodput analyze events.jsonl        # in a checkout of repo 12
 
 ## What a lab run shows
 
-The unit tests use a real run from a local Slurm build (`tests/fixtures/run`), recorded before the lab's `cred_expire` was lowered to 30 s:
+CI run 11 (two GPU faults on a 2-node, 8-GPU job of 150 one-second steps, checkpoint every 25 steps). These are the real files from that run, kept in [tests/fixtures/ci-run](../tests/fixtures/ci-run); a unit test rebuilds the event log from them and checks it is identical.
 
 ```
-start 15:50:18 → checkpoint 15:50:38–41 → XID 48 on gpu-3 15:50:45 → requeued 15:50:48
-→ next run starts 15:53:19 → running 15:53:24 → two checkpoints → end 15:54:15
+sacct -D -X -P -n -o JobIDRaw,JobName,State,Start,End,NNodes,NodeList,AllocTRES,ExitCode
+3|lab-train|REQUEUED|2026-10-04T17:05:17|2026-10-04T17:05:53|2|gpu-[1-2]|billing=8,cpu=8,gres/gpu=8,node=2|0:0
+3|lab-train|REQUEUED|2026-10-04T17:06:53|2026-10-04T17:07:33|2|gpu-[3-4]|billing=8,cpu=8,gres/gpu=8,node=2|0:0
+3|lab-train|COMPLETED|2026-10-04T17:08:53|2026-10-04T17:10:47|2|gpu-[1,4]|billing=8,cpu=8,gres/gpu=8,node=2|0:0
 ```
 
-| Category | Share |
-|---|---|
-| Productive | 27.4% |
-| Checkpoint writes | 3.8% |
-| Lost work (since the last checkpoint) | 1.7% |
-| Detection (fault to requeue) | 1.3% |
-| Waiting for nodes | 63.7% |
-| Restart (startup until running) | 2.1% |
+| | Fault 1 | Fault 2 |
+|---|---|---|
+| What | XID 79 on gpu-2, GPU 2 | XID 64 + row-remap failure on gpu-3, GPU 1 |
+| Fault reported | 17:05:51 | 17:07:27 |
+| Health check drains and requeues | 17:05:53 (+2 s) | 17:07:33 (+6 s) |
+| Job starts again (other nodes) | 17:06:53 (+60 s) | 17:08:53 (+80 s) |
+| Training resumes from checkpoint | 17:06:58 (+5 s) | 17:08:58 (+5 s) |
+
+`python -m goodput analyze` (repo 12) on the event log, 330 s of 8 GPUs:
+
+| Category | Share | Seconds |
+|---|---|---|
+| Productive | 47.0% | 155 |
+| Checkpoint writes | 4.5% | 15 |
+| Lost work (since the last checkpoint) | 0.6% | 2 |
+| Detection (fault to requeue) | 2.4% | 8 |
+| Waiting for nodes | 42.4% | 140 |
+| Restart (startup until running) | 3.0% | 10 |
 
 Two lessons, both visible only because the numbers come from a real scheduler:
 
-- **Waiting dominated, with idle nodes available.** That is the requeue delay: a requeued job waits for its previous launch credential to expire (`AuthInfo=cred_expire`, 120 s by default) before it can start. On a two-minute lab job it is most of the run; on a multi-week training job it is small per interruption, but it is paid on every one. Shortening `cred_expire` shortens it.
-- **Detection is the health-check interval.** The job hung instead of failing; nothing noticed until the next health check (3 s here, up to 10 s with this lab's interval). With a 5-minute interval, every hardware fault would cost up to 5 minutes of the whole job's GPUs.
+- **Waiting dominated, with idle nodes available.** A requeued batch job cannot start until the launch credential of its previous run has expired (`AuthInfo=cred_expire`: 120 s by default, 30 s in this lab), and then it waits for the next scheduling pass. Here that was 60 to 80 s per requeue. On a two-minute lab job it is almost half the run; on a multi-week training job it is small per interruption, but it is paid on every one, by every GPU of the job.
+- **Detection is the health-check interval.** The job hung instead of failing; nothing noticed until the next health check (2 and 6 s here, up to 10 s with this lab's interval). With a 5-minute interval, every hardware fault would cost up to 5 minutes of the whole job's GPUs.
 
-The CI run with `cred_expire=30` and two faults is in the [README](../README.md#ci-run).
+The faults were injected right after a checkpoint, so almost no work was lost. Lost work grows with the time since the last checkpoint; that trade-off is what repo 12's Young/Daly calculation is about.

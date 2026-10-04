@@ -32,7 +32,7 @@ Slurm accounting knows when each run started and ended but not why it ended, nor
 
 - Jobs run as root, and the MUNGE key is created in the image. Both are wrong for a real cluster.
 - Telemetry is a shared JSON file per node instead of DCGM on each node.
-- No cgroups: `proctrack/linuxproc` and `task/none`, so GPUs are allocated but not isolated.
+- The GPU nodes run privileged, so slurmd can manage its own cgroups without systemd. No cgroup limits are applied (`proctrack/linuxproc`, `task/none`): GPUs are allocated but not isolated.
 - Slurm 23.11 from the Ubuntu archive, not the latest release.
 
 ## What is missing
