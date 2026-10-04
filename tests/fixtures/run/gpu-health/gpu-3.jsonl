@@ -1,1 +1,0 @@
-{"time": "2026-10-04T15:50:48Z", "node": "gpu-3", "action": "drain", "state": "allocated", "findings": [{"gpu": 0, "action": "drain", "what": "XID 48", "detail": "double-bit ECC error", "time": "2026-10-04T15:50:45Z"}], "drained": "gpu-health:drain XID 48 on GPU 0 (double-bit ECC error)", "requeued": ["2"], "note": ""}
