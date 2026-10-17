@@ -6,7 +6,7 @@ GPU node operations for a Slurm cluster: a health check that drains nodes by XID
 
 ![ci](https://github.com/inigogonzalezgarcia/14-slurm-gpu-ops/actions/workflows/ci.yml/badge.svg)
 
-> A learning-in-public lab about day 2 operations for GPU clusters. I don't have production GPU fleet or Slurm administration experience; this project is how I am learning the problem. The Slurm cluster is real (Slurm 23.11 from Ubuntu packages, with slurmdbd and MariaDB). The GPUs are not: each node has four placeholder devices and a JSON file that stands in for DCGM.
+> A lab on day 2 operations for GPU clusters, built on running Linux (Red Hat) servers. The Slurm cluster is real (Slurm 23.11 from Ubuntu packages, with slurmdbd and MariaDB). The GPUs are not: each node has four placeholder devices and a JSON file that stands in for DCGM.
 
 Sixth in a series: [09 – node remediation](https://github.com/inigogonzalezgarcia/09-gpu-node-remediation) (the same loop on Kubernetes, and the XID policy reused here), [10 – fleet observability](https://github.com/inigogonzalezgarcia/10-gpu-fleet-observability), [11 – fleet lifecycle](https://github.com/inigogonzalezgarcia/11-gpu-fleet-lifecycle), [12 – goodput and MTBI](https://github.com/inigogonzalezgarcia/12-gpu-goodput-mtbi) (the analyzer fed from `sacct` here), [13 – cluster acceptance](https://github.com/inigogonzalezgarcia/13-cluster-acceptance-burnin).
 
@@ -68,11 +68,11 @@ docker compose down -v
 - [docs/goodput-from-sacct.md](docs/goodput-from-sacct.md): building repo 12's event log from Slurm, and what a real run shows
 - [docs/decisions.md](docs/decisions.md): design decisions, lab shortcuts, what is missing
 
-## Not tested here
+## Next steps for real nodes
 
-- Real GPUs: the `nvidia-smi` + kernel-log source in `gpuops/sources.py` is written and unit-tested on sample text only.
-- cgroup GPU isolation, NVML autodetection, Slurm versions other than 23.11.
-- Running the policy as an NHC (Node Health Check) module, which is what most clusters use.
+- Switch the health source to `nvidia-smi` and the kernel log (`gpuops/sources.py`, already written and unit-tested on sample text).
+- Enable cgroup GPU isolation and NVML autodetection, and check the setup on your Slurm version (the lab uses 23.11).
+- Run the policy as an NHC (Node Health Check) module, which is what most clusters use.
 
 ## Customisation and contact
 
